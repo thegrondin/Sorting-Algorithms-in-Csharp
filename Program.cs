@@ -9,11 +9,28 @@ namespace Sorting_Algo
         static void Main(string[] args)
         {
 
-            var list = new List<int> { 5, 3, 1, 4, 2, 9, 6, 8, 7 };
+            var list = GenerateRandom();
 
-            DisplayResult(SelectionSort(new List<int>(list)));
-            DisplayResult(InsertionSort(new List<int>(list)));
-            DisplayResult(MergeSort(new List<int>(list)));
+            var algorithms = new Dictionary<string, Func<List<int>, List<int>>>();
+
+            
+            algorithms.Add("SelectionSort", SelectionSort);
+            algorithms.Add("InsertionSort", InsertionSort);
+            algorithms.Add("MergeSort", MergeSort);
+            algorithms.Add("QuickSortWithMerge", QuickSortWithMerge);
+            algorithms.Add("QuickSort", QuickSort);
+
+            var watch = new System.Diagnostics.Stopwatch();
+
+            foreach (var algo in algorithms)
+            {
+                watch.Start();
+                algo.Value(new List<int>(list));
+                Console.WriteLine(algo.Key + " Finished. Sorting time : " + watch.ElapsedMilliseconds + "ms");
+                watch.Stop();
+                watch = new System.Diagnostics.Stopwatch();
+            }
+
         }
 
         static List<int> SelectionSort(List<int> list)
@@ -100,6 +117,84 @@ namespace Sorting_Algo
 
             return Merge(first, second);
 
+        }
+
+        static List<int> Partition(List<int> list)
+        {
+            return list;
+        }
+
+        static List<int> QuickSortWithMerge(List<int> list)
+        {
+            if (list.Count <= 1) return list;
+
+            var pivot = list.Last();
+            var i = -1;
+
+            for (int j = 0; j < list.Count - 2; j++)
+            {
+                if (list[j] < pivot)
+                {
+                    i++;
+                    Swap(i, j, ref list);
+                }
+            }
+
+            list.Insert(i + 1, pivot);
+            list.RemoveAt(list.Count - 1);
+
+            var first = list.Take(i+1).ToList();
+            var second = list.Skip(i+2).ToList();
+
+            first = QuickSortWithMerge(first);
+            second = QuickSortWithMerge(second);
+
+            first.Add(pivot);
+
+            return Merge(first, second);
+        }
+
+
+        static List<int> QuickSort(List<int> list)
+        {
+            if (list.Count <= 1) return list;
+            int pivotPosition = list.Count / 2;
+            int pivotValue = list[pivotPosition];
+            list.RemoveAt(pivotPosition);
+            List<int> smaller = new List<int>();
+            List<int> greater = new List<int>();
+            foreach (int item in list)
+            {
+                if (item < pivotValue)
+                {
+                    smaller.Add(item);
+                }
+                else
+                {
+                    greater.Add(item);
+                }
+            }
+            List<int> sorted = QuickSort(smaller);
+            sorted.Add(pivotValue);
+            sorted.AddRange(QuickSort(greater));
+            return sorted;
+        }
+
+        static List<int> GenerateRandom()
+        {
+            var list = new List<int>();
+            var rand = new Random();
+
+            for (int i = 0; i < 50000; i++)
+            {
+                var randNumber = rand.Next(0, 500000);
+
+                if (list.Contains(randNumber)) continue;
+
+                list.Add(randNumber);
+            }
+
+            return list;
         }
 
         static void Swap(int x, int y, ref List<int> list)
