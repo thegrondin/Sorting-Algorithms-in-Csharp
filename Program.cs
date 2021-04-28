@@ -24,11 +24,12 @@ namespace Sorting_Algo
 
             foreach (var algo in algorithms)
             {
+                watch = new System.Diagnostics.Stopwatch();
                 watch.Start();
                 algo.Value(new List<int>(list));
                 Console.WriteLine(algo.Key + " Finished. Sorting time : " + watch.ElapsedMilliseconds + "ms");
                 watch.Stop();
-                watch = new System.Diagnostics.Stopwatch();
+               
             }
 
         }
